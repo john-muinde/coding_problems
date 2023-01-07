@@ -1,3 +1,8 @@
+/* Longest Palindromic Substring
+Medium
+
+Given a string s, return the longest palindromic substring in s. */
+
 /**
  * @param {number} x
  * @return {boolean}
