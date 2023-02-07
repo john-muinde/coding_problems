@@ -40,18 +40,46 @@ class KeyboardInterrupt(Exception):
         self.message = message
         super().__init__(self.message)
 
-import socket
+
+port = 5005
 
 
+def udp_communication(sock):
+    try:
+        while True and (KeyboardInterrupt):
+            data, addr = sock.recvfrom(1024)
+            print('Server: ', data.decode())
+            sent = sock.sendto(input('Client: ').encode(), addr)
+    except (KeyboardInterrupt or SystemExit or socket.error):
+        sock.close()
+
+
+def tcp_communication(sock):
+    try:
+        sock.connect(('localhost', port))
+        while True and (KeyboardInterrupt):
+            data = sock.recv(1024).decode()
+            print('Server: ', data)
+            sent = sock.send(input('Client: ').encode())
+    except (KeyboardInterrupt or SystemExit or socket.error or EOFError):
+        sock.close()
+
+
+# Creating a socket for both TCP and UDP communication
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-sock.bind(("0.0.0.0", 5005))
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(("0.0.0.0", port))
 
-try:
-    while True:
-        data, addr = sock.recvfrom(1024)
-        # sock.sendto(bytes("hello", "utf-8"), ip_co)
-        print('Server: ',data.decode())
-        sock.sendto(input('Client: ').encode(), addr)
-except( KeyboardInterrupt or SystemExit):
-    raise KeyboardInterrupt()
+# Prompting the user to choose between TCP and UDP communication
+protocol = input("Choose between TCP (t) and UDP (u) communication: ")
+if protocol == 'u':
+    # Starting the UDP communication
+    udp_communication(sock)
+elif protocol == 't':
+    # Closing the UDP socket and creating a TCP socket
+    sock.close()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Starting the TCP communication
+    tcp_communication(sock)
+else:
+    print("Invalid option selected")
