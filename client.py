@@ -51,7 +51,9 @@ def udp_communication(sock):
             print('Server: ', data.decode())
             sent = sock.sendto(input('Client: ').encode(), addr)
     except (KeyboardInterrupt or SystemExit or socket.error):
+        sock.send(('Client: Disconnected ').encode())
         sock.close()
+        socket.get
 
 
 def tcp_communication(sock):
@@ -62,6 +64,7 @@ def tcp_communication(sock):
             print('Server: ', data)
             sent = sock.send(input('Client: ').encode())
     except (KeyboardInterrupt or SystemExit or socket.error or EOFError):
+        sock.send(('Client: disconnected ').encode())
         sock.close()
 
 

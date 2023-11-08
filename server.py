@@ -72,6 +72,7 @@ import socket
 
 import threading
 import time
+import sys
 
 from getmac import getmac
 
@@ -115,6 +116,7 @@ def udp_threading(allips):
             time.sleep(2)
         except KeyboardInterrupt or SystemExit:
             jls_extract_def()
+            break
 
 
 def tcp_threading(allips):
@@ -129,23 +131,28 @@ def tcp_threading(allips):
     print(f'Server listening on {host}:{port}')
 
     while True:
-
         try:
             c, addr = s.accept()
-            print(f'Client {addr} connected')
-            c.send(f'{addr} joined'.encode())
+            # print(f'Client {addr} connected')
+            c.send(f'{addr} joined current users {allips}'.encode())
             while True:
                 data = c.recv(1024).decode()
                 if not data:
                     break
                 print('Client: ', data)
-                c.send(input('Server: ').encode())
+                try:
+                    c.send(input('Server: ').encode())
+                except EOFError:
+                    s.close()
+                    exit()
+
             c.close()
             s.close()
 
-        except KeyboardInterrupt or SystemExit or socket.error or EOFError:
-            raise KeyboardInterrupt()
+        except:
+            print('Exceptions!!!!!!!!!!!!!!!!!!!!!!')
             s.close()
+            sys.exit()
 
 
 def main():
